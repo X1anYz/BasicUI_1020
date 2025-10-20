@@ -1,6 +1,5 @@
 package tw.edu.pu.csim.tcyang.basicui
 
-
 import android.app.Activity
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -20,16 +19,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ButtonDefaults.buttonColors
-import androidx.compose.material3.ButtonDefaults.shape
-import androidx.compose.material3.CheckboxDefaults.colors
-import androidx.compose.material3.FloatingActionButtonDefaults.elevation
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,7 +41,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import tw.edu.pu.csim.tcyang.basicui.ui.theme.BasicUITheme
@@ -71,6 +64,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Main(modifier: Modifier = Modifier) {
 
+    // 圖片資源清單
     var Animals = listOf(R.drawable.animal0, R.drawable.animal1,
         R.drawable.animal2, R.drawable.animal3,
         R.drawable.animal4, R.drawable.animal5,
@@ -82,6 +76,10 @@ fun Main(modifier: Modifier = Modifier) {
 
     var flag by remember { mutableStateOf("test") }
 
+    // **圖片按鈕狀態：追蹤目前顯示哪張圖片 (0 或 1)**
+    var currentImageIndex by remember { mutableStateOf(0) }
+
+
     // 取得當前的 Context
     val context = LocalContext.current
 
@@ -89,10 +87,8 @@ fun Main(modifier: Modifier = Modifier) {
     var mper: MediaPlayer? by remember { mutableStateOf(null) }
 
     // 使用 DisposableEffect 來管理 MediaPlayer 的生命週期
-    // 當 Main Composable 離開組合時，會執行 onDispose 區塊
-    DisposableEffect(Unit) { // Unit 作為 key 表示這個 effect 只會執行一次
+    DisposableEffect(Unit) {
         onDispose {
-            // 釋放 MediaPlayer 資源，避免記憶體洩漏
             mper?.release()
             mper = null
         }
@@ -101,11 +97,13 @@ fun Main(modifier: Modifier = Modifier) {
 
     Column (
         modifier = modifier
-            .fillMaxSize() // 1. 設定全螢幕（填滿父容器）
-            .background(Color(0xFFE0BBE4)), // 4. 設定背景為淺紫色
-        horizontalAlignment = Alignment.CenterHorizontally, // 2. 設定水平置中
-        verticalArrangement = Arrangement.Top // 3. 設定垂直靠上
+            .fillMaxSize()
+            .background(Color(0xFFE0BBE4)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top // 保持垂直靠上
     ) {
+
+        // 標題區域
         Text(text = stringResource(R.string.app_title),
             fontSize = 25.sp,
             color = Color.Blue,
@@ -123,6 +121,7 @@ fun Main(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.size(10.dp))
 
         Row {
+            // Android, Compose, Firebase 圖示
             Image(
                 painter = painterResource(id = R.drawable.android),
                 contentDescription = "Android 圖示",
@@ -149,6 +148,7 @@ fun Main(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.size(10.dp))
 
+        // LazyRow 顯示動物
         LazyRow {
             items(51) { index ->
                 Text(text = "$index:")
@@ -167,7 +167,9 @@ fun Main(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.size(10.dp))
 
 
-
+        // ----------------------------------------------------------------------------------
+        // 原本的 "按鈕測試" 按鈕
+        // ----------------------------------------------------------------------------------
         Button(
             onClick = {
                 if (flag == "test"){
@@ -192,21 +194,25 @@ fun Main(modifier: Modifier = Modifier) {
         Text(text = flag)
 
         Spacer(modifier = Modifier.size(10.dp))
+
+        // ----------------------------------------------------------------------------------
+        // 原本的【三個並排按鈕】
+        // ----------------------------------------------------------------------------------
         Row{
             Button(
                 onClick = {
-                    mper?.release()  //釋放資源
-                    mper = null // 清除舊引用
+                    mper?.release()
+                    mper = null
 
-                    mper = MediaPlayer.create(context, R.raw.tcyang) //設定音樂
+                    mper = MediaPlayer.create(context, R.raw.tcyang)
                     mper?.start()
-                          },
+                },
 
                 modifier = Modifier
                     .fillMaxWidth(0.33f)
                     .fillMaxHeight(0.8f),
 
-                colors = buttonColors(Color.Green)
+                colors = ButtonDefaults.buttonColors(Color.Green)
 
 
             ) {
@@ -215,25 +221,25 @@ fun Main(modifier: Modifier = Modifier) {
                 Image(painterResource(id = R.drawable.teacher),
                     contentDescription ="teacher icon")
 
-        }
+            }
 
-                Spacer(modifier = Modifier.size(10.dp))
+            Spacer(modifier = Modifier.size(10.dp))
 
-                Button(onClick = {
-                    mper?.release()  //釋放資源
-                    mper = null // 清除舊引用
+            Button(onClick = {
+                mper?.release()
+                mper = null
 
-                    mper = MediaPlayer.create(context, R.raw.fly) //設定音樂
-                    mper?.start()
-                },
+                mper = MediaPlayer.create(context, R.raw.fly)
+                mper?.start()
+            },
 
                 modifier = Modifier
                     .fillMaxWidth(0.5f)
                     .fillMaxHeight(0.4f),
 
-                colors = buttonColors(Color.Blue)
+                colors = ButtonDefaults.buttonColors(Color.Blue)
 
-                ) {
+            ) {
                 Text(text = "展翅飛翔", color = Color.White)
                 Image(
                     painterResource(id = R.drawable.fly),
@@ -241,31 +247,69 @@ fun Main(modifier: Modifier = Modifier) {
 
             }
 
-                Spacer(modifier = Modifier.size(10.dp))
+            Spacer(modifier = Modifier.size(10.dp))
 
-                Button(onClick = {
-                    val activity = context as? Activity
-                    activity?.finish()},
-                    // 設定按鈕顏色為亮藍色
+            Button(onClick = {
+                val activity = context as? Activity
+                activity?.finish()},
 
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BFFF)),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BFFF)),
 
-                    //形狀：將元素的每個角落「切掉」一個直角
+                shape = CutCornerShape(10),
 
-                    shape = CutCornerShape(10),
+                border = BorderStroke(1.dp, Color.Blue),
 
-                    //藍色框線
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp)
 
-                    border = BorderStroke(1.dp, Color.Blue),
-
-                    //陰影
-
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp)
-
-                ) {
+            ) {
                 Text(text = "結束App")
-                }
             }
-
         }
+
+        // ----------------------------------------------------------------------------------
+        // ✨ 新增的圖片切換按鈕，現在位於最底部的 Row 按鈕之下
+        // ----------------------------------------------------------------------------------
+
+        Spacer(modifier = Modifier.size(20.dp)) // 增加間隔
+
+        // 圖片判斷邏輯 (切換 animal0 和 animal1)
+        val currentAnimalResId = if (currentImageIndex == 0) {
+            Animals[0] // 鴨子 (animal0)
+        } else {
+            Animals[1] // 企鵝 (animal1)
+        }
+
+        // 圖形按鈕：點擊切換圖片
+        Button(
+            onClick = {
+                // 1. 切換狀態：0 變 1，1 變 0
+                currentImageIndex = if (currentImageIndex == 0) 1 else 0
+
+                // 2. 顯示 Toast 訊息
+                val name = AnimalsName[currentImageIndex]
+                Toast.makeText(
+                    context,
+                    "已切換到 $name",
+                    Toast.LENGTH_SHORT
+                ).show()
+            },
+            // 設定按鈕樣式
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+            elevation = ButtonDefaults.buttonElevation(0.dp),
+            border = BorderStroke(2.dp, Color.Red),
+            modifier = Modifier.size(120.dp)
+        ) {
+            // 按鈕的內容：顯示動態切換的動物圖片
+            Image(
+                painter = painterResource(id = currentAnimalResId),
+                contentDescription = "切換動物圖示",
+                modifier = Modifier.size(100.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.size(10.dp))
+
+        // ----------------------------------------------------------------------------------
+
+    }
 }
